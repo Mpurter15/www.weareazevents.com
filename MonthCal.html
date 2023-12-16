@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Event Calendar</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+        }
+
+        header {
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            padding: 1em;
+            border-bottom: 2px solid #fff;
+        }
+
+        .calendar {
+            max-width: 800px;
+            margin: 20px auto;
+            background-color: #fff;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .month-header {
+            background-color: #007BFF;
+            color: #fff;
+            padding: 1em;
+            text-align: center;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .days-of-week {
+            display: flex;
+            background-color: #ddd;
+        }
+
+        .day {
+            flex: 1;
+            padding: 0.5em;
+            text-align: center;
+            border-right: 1px solid #ccc;
+            border-bottom: 1px solid #ccc;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .days {
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        .day-number {
+            padding: 0.5em;
+            text-align: center;
+            flex: 1 0 calc(100% / 7);
+            border-right: 1px solid #ccc;
+            border-bottom: 1px solid #ccc;
+            cursor: pointer;
+        }
+
+        .event-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #007BFF;
+            color: #fff;
+            padding: 0.5em;
+            border-radius: 5px;
+            display: none;
+        }
+
+        .event-container.visible {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Interactive Event Calendar</h1>
+    </header>
+
+    <div class="calendar">
+        <div class="month-header">
+            <button onclick="previousMonth()">Previous Month</button>
+            <h2 id="currentMonth"></h2>
+            <button onclick="nextMonth()">Next Month</button>
+        </div>
+
+        <div class="days-of-week">
+            <div class="day">Sun</div>
+            <div class="day">Mon</div>
+            <div class="day">Tue</div>
+            <div class="day">Wed</div>
+            <div class="day">Thu</div>
+            <div class="day">Fri</div>
+            <div class="day">Sat</div>
+        </div>
+
+        <div class="days" id="calendarDays">
+            <!-- Days will be dynamically generated here -->
+        </div>
+    </div>
+
+    <div class="event-container" id="eventContainer">
+        <input type="text" id="eventInput" placeholder="Add your event...">
+        <button onclick="addEvent()">Add Event</button>
+        <button onclick="closeEventContainer()">Close</button>
+    </div>
+
+    <script>
+        let currentDate = new Date();
+        let selectedDate;
+
+        function populateCalendar(year, month) {
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+
+            document.getElementById('currentMonth').textContent = `${firstDay.toLocaleString('default', { month: 'long' })} ${year}`;
+
+            const calendarDays = document.getElementById('calendarDays');
+            calendarDays.innerHTML = '';
+
+            const startDay = firstDay.getDay();
+            const daysInMonth = lastDay.getDate();
+
+            for (let i = 0; i < startDay; i++) {
+                const emptyDay = document.createElement('div');
+                emptyDay.classList.add('day-number', 'empty');
+                calendarDays.appendChild(emptyDay);
+            }
+
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayContainer = document.createElement('div');
+                dayContainer.classList.add('day-number');
+                dayContainer.addEventListener('click', () => openEventContainer(day));
+                dayContainer.textContent = day;
+
+                const events = getEvents(year, month, day);
+                if (events.length > 0) {
+                    const eventBadge = document.createElement('span');
+                    eventBadge.classList.add('event-badge');
+                    eventBadge.textContent = events.length;
+                    dayContainer.appendChild(eventBadge);
+                }
+
+                calendarDays.appendChild(dayContainer);
+            }
+        }
+
+        function openEventContainer(day) {
+            selectedDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
+            const eventContainer = document.getElementById('eventContainer');
+            eventContainer.classList.add('visible');
+        }
+
+        function closeEventContainer() {
+            const eventContainer = document.getElementById('eventContainer');
+            eventContainer.classList.remove('visible');
+        }
+
+        function addEvent() {
+            const eventInput = document.getElementById('eventInput');
+            const eventDescription = eventInput.value.trim();
+
+            if (eventDescription !== '') {
+                saveEvent(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate(), eventDescription);
+                closeEventContainer();
+                populateCalendar(currentDate.getFullYear(), currentDate.getMonth());
+            }
+        }
+
+        function saveEvent(year, month, day, description) {
+            // In a real application, you would save the event to a database or storage.
+            // For this example, we'll use local storage.
+            const eventsKey = `events_${year}_${month}`;
+            let events = JSON.parse(localStorage.getItem(eventsKey)) || [];
+
+            events.push({
+                day,
+                description
+            });
+
+            localStorage.setItem(eventsKey, JSON.stringify(events));
+        }
+
+        function getEvents(year, month, day) {
+            const eventsKey = `events_${year}_${month}`;
+            const events = JSON.parse(localStorage.getItem(eventsKey)) || [];
+
+            return events.filter(event => event.day === day);
+        }
+
+        function previousMonth() {
+            currentDate.setMonth(currentDate.getMonth() - 1);
+            populateCalendar(currentDate.getFullYear(), currentDate.getMonth());
+        }
+
+        function nextMonth() {
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            populateCalendar(currentDate.getFullYear(), currentDate.getMonth());
+        }
+
+        populateCalendar(currentDate.getFullYear(), currentDate.getMonth());
+    </script>
+</body>
+</html>
