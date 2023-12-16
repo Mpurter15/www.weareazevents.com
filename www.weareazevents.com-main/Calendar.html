@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Calendar</title>
+
+    <!-- Your CSS styles here -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+        }
+
+        #banner {
+            background-color: #333;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        #navbar {
+            background-color: #444;
+            overflow: hidden;
+        }
+
+        #navbar a {
+            float: left;
+            display: block;
+            color: white;
+            text-align: center;
+            padding: 14px 16px;
+            text-decoration: none;
+        }
+
+        #navbar a:hover {
+            background-color: #ddd;
+            color: black;
+        }
+
+        .day {
+            width: 500px;
+            height: 360px;
+            border: 23px solid #a81a1a;
+            box-shadow: #333;
+            display: inline-block;
+            margin: 20px; /* Increased margin */
+            box-sizing: border-box;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .event-image {
+            max-width: 100%;
+            max-height: 100%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .day:hover .event-image {
+            display: block;
+        }
+
+        #event-details {
+            display: none;
+            background-color: white;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1000;
+        }
+
+        #close-button {
+            cursor: pointer;
+            float: right;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        #event-title {
+            margin-bottom: 10px;
+        }
+
+        #event-date {
+            margin-bottom: 10px;
+        }
+
+        #event-description {
+            margin-bottom: 10px;
+        }
+
+        #event-image-popup {
+            max-width: 70%; /* Adjust as needed */
+            max-height: 70%; /* Adjust as needed */
+            display: block;
+            margin: 10px auto; /* Added margin */
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Banner Section -->
+    <div id="banner">
+        <h1>We Are AZ Events</h1>
+        <p>Your Event Destination</p>
+    </div>
+
+    <!-- Navigation Bar -->
+    <div id="navbar">
+        <a href="/HomePage.html/Homepage.html">Home</a>
+        <a href="/Calendar.html">Calendar</a>
+        <a href="#">Contact</a>
+        <a href="#">About Us</a>
+    </div>
+
+    <!-- Sample Event Details Popup -->
+    <div id="event-details">
+        <span id="close-button" onclick="closeEventDetails()">X</span>
+        <h2 id="event-title"></h2>
+        <p id="event-date"></p>
+        <p id="event-description"></p>
+        <img id="event-image-popup" alt="Event Flyer">
+    </div>
+
+    <!-- Sample Days (Replace with your data) -->
+    <div class="day" onclick="showEventDetails('Canvas & Jams: Throwback Edition', '2023-01-14', 'Roll into the new year with style! Canvas & Jams: Throwback Edition on January 14, 2023, is the spot where the streets meet art and beats. Snag your spot for the hottest paint and sip in town, vibing to 90s beats and unleashing your creativity. Don\'t miss the masterpiece – it\'s not just an event, it\'s the culture', 'Content/123.png')">
+        <img class="event-image" src="Content/123.png" alt="Canvas & Jams: Throwback Edition">
+        <h6>Canvas & Jams: Throwback Edition</h6>
+        <p>Jan 14</p>
+    </div>
+    <!-- Add more days as needed -->
+
+    <script>
+        function showEventDetails(title, date, description, image) {
+            document.getElementById('event-title').textContent = title;
+            document.getElementById('event-date').textContent = formatDate(date);
+            document.getElementById('event-description').textContent = description;
+            document.getElementById('event-image-popup').src = image ? image : '';
+            document.getElementById('event-details').style.display = 'block';
+        }
+
+        function formatDate(dateString) {
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            return new Date(dateString).toLocaleDateString('en-US', options);
+        }
+
+        function closeEventDetails() {
+            document.getElementById('event-details').style.display = 'none';
+        }
+    </script>
+
+</body>
+</html>
